@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SABLONHITZ.COM | Premium Apparel Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
+        .hidden { display: none; }
+        .active-size { border-color: #2563eb !important; background-color: #eff6ff !important; color: #2563eb !important; }
+        .active-thumb { border-color: #2563eb !important; ring: 2px; --tw-ring-color: #dbeafe; }
+
+        /* Custom Studio Style */
+        .mockup-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.02);
+        }
+
+        #canvas-area {
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px; 
+            height: 220px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #user-upload-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+        }
+
+        #mockup-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 10;
+        }
+
+        .color-choice {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 0 0 1px #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .color-choice.active {
+            transform: scale(1.15);
+            box-shadow: 0 0 0 2px #2563eb;
+        }
+
+        /* Nav Style */
+        .nav-desktop { display: none; }
+        .nav-mobile { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.9); 
+            backdrop-filter: blur(12px); border-radius: 24px; display: flex;
+            justify-content: space-around; align-items: center; padding: 12px 10px;
+            z-index: 100; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 10px; font-weight: 700; text-transform: uppercase; transition: all 0.3s ease; }
+        .nav-item.active { color: #3b82f6; }
+        .nav-item i { margin-bottom: 4px; width: 20px; height: 20px; }
+
+        @media (min-width: 768px) {
+            .nav-mobile { display: none; }
+            .nav-desktop { display: flex; gap: 32px; font-weight: 700; font-size: 14px; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
+            .nav-desktop a:hover { color: #2563eb; }
+        }
+
+        /* Animations */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes pulse-soft { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+        .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="javascript:void(0)" onclick="showPage('home')" class="text-2xl font-black tracking-tighter text-blue-600 italic uppercase">Sablon.co</a>
+            
+            <div class="nav-desktop">
+                <a href="javascript:void(0)" onclick="showPage('catalog')">Katalog</a>
+                <a href="javascript:void(0)" onclick="showPage('custom')">Custom Sablon</a>
+                <a href="javascript:void(0)" onclick="alert('Size Chart: S(48x68), M(50x70), L(52x72), XL(54x74)')">Size Chart</a>
+                <a href="#footer">Hubungi Kami</a>
+            </div>
+
+            <button onclick="showPage('cart')" class="relative p-2 bg-slate-50 rounded-xl hover:bg-blue-50 transition-colors">
+                <i data-lucide="shopping-cart" class="w-6 h-6 text-slate-700"></i>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="nav-mobile">
+        <a href="javascript:void(0)" onclick="showPage('catalog')" class="nav-item">
+            <i data-lucide="layout-grid"></i>
+            <span>Katalog</span>
+        </a>
+        <a href="javascript:void(0)" onclick="showPage('custom')" class="nav-item">
+            <i data-lucide="pen-tool"></i>
+            <span>Custom</span>
+        </a>
+        <a href="javascript:void(0)" onclick="showPage('cart')" class="nav-item">
+            <i data-lucide="shopping-bag"></i>
+            <span>Keranjang</span>
+        </a>
+        <a href="#footer" class="nav-item">
+            <i data-lucide="info"></i>
+            <span>Info</span>
+        </a>
+    </div>
+
+    <div id="page-home" class="page">
+        <section id="hero-banner" class="container mx-auto px-4 py-6">
+            <div class="bg-slate-900 rounded-[2.5rem] p-10 md:p-16 text-white relative overflow-hidden shadow-2xl">
+                <div class="relative z-10 max-w-lg text-center md:text-left">
+                    <span class="text-blue-400 font-bold text-xs tracking-widest uppercase mb-4 block">Premium Screen Printing</span>
+                    <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight uppercase">Style <span class="text-blue-500">Unlimit.</span></h1>
+                    <p class="text-slate-400 text-sm md:text-lg mb-8 italic">Bahan Cotton Combed kualitas ekspor pilihan.</p>
+                    <a href="javascript:void(0)" onclick="showPage('catalog')" class="inline-block bg-blue-600 text-white font-bold py-4 px-10 rounded-2xl hover:bg-white hover:text-slate-900 transition-all shadow-lg">Mulai Belanja</a>
+                </div>
+                <div class="absolute right-[-10%] top-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[120px]"></div>
+            </div>
+        </section>
+
+        <main id="katalog" class="container mx-auto px-4 py-12">
+            <h2 class="text-2xl font-black text-slate-900 mb-8 tracking-tight uppercase italic" id="katalog-title">Katalog Terbaru</h2>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8" id="product-grid"></div>
+        </main>
+
+        <div id="extra-sections">
+            <section class="container mx-auto px-4 py-4 text-white">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[2rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl">
+                    <div class="text-center md:text-left">
+                        <h3 class="text-3xl font-black mb-2 italic tracking-tighter uppercase">PROMO TERBARU!</h3>
+                        <p class="text-blue-100 font-medium">Beli 3 Kaos Gratis 1 Totebag.</p>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 text-center w-full md:w-auto">
+                        <p class="text-[10px] font-bold uppercase tracking-widest mb-1 text-blue-100">Kode Promo</p>
+                        <p class="text-2xl font-black tracking-tighter uppercase">SABLONHITZ</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="container mx-auto px-4 py-16">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div class="feature-box p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm group">
+                        <div class="icon-wrapper w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-float">
+                            <i data-lucide="shield-check" class="w-10 h-10"></i>
+                        </div>
+                        <h4 class="font-extrabold text-xl mb-2 uppercase italic tracking-tighter">Bahan Premium</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Cotton Combed 30s kualitas ekspor yang lembut.</p>
+                    </div>
+                    <div class="feature-box p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm group">
+                        <div class="icon-wrapper w-20 h-20 bg-orange-50 text-orange-600 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-pulse-soft">
+                            <i data-lucide="zap" class="w-10 h-10"></i>
+                        </div>
+                        <h4 class="font-extrabold text-xl mb-2 uppercase italic tracking-tighter">Sablon Presisi</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Teknik Plastisol Discharge tidak pecah saat dicuci.</p>
+                    </div>
+                    <div class="feature-box p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm group">
+                        <div class="icon-wrapper w-20 h-20 bg-green-50 text-green-600 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-spin-slow">
+                            <i data-lucide="refresh-cw" class="w-10 h-10"></i>
+                        </div>
+                        <h4 class="font-extrabold text-xl mb-2 uppercase italic tracking-tighter">Proses Cepat</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Pengerjaan tepat waktu dan transparan.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="page-custom" class="page hidden container mx-auto px-4 py-12">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-10 text-center md:text-left">
+                <h2 class="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">Custom <span class="text-blue-600">Studio.</span></h2>
+                <p class="text-slate-400 text-sm mt-2 font-bold uppercase tracking-widest">Buat desainmu sendiri di sini</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-10 bg-white p-6 md:p-12 rounded-[3.5rem] shadow-sm border border-slate-100">
+                <div class="flex flex-col items-center">
+                    <div class="mockup-wrapper border-2 border-slate-50">
+                        <img id="mockup-bg" src="https://i.ibb.co.com/xKCGCJjN/1.jpg" alt="Kaos Polos">
+                        <div id="canvas-area">
+                            <img id="user-upload-img" src="" class="hidden animate-pulse-soft">
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center gap-3 bg-slate-50 px-6 py-2 rounded-full border border-slate-100 italic font-bold text-[10px] text-slate-500">
+                        <i data-lucide="camera" class="w-4 h-4"></i> PREVIEW: SISI DEPAN
+                    </div>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <div class="space-y-10">
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase mb-4 tracking-widest italic">1. Warna Kaos</label>
+                            <div class="flex flex-wrap gap-4">
+                                <div onclick="changeStudioColor('Hitam', 'https://i.ibb.co.com/xKCGCJjN/1.jpg', this)" class="color-choice bg-black active"></div>
+                                <div onclick="changeStudioColor('Putih', 'https://i.ibb.co.com/Psr7q0Jm/2.jpg', this)" class="color-choice bg-white"></div>
+                                <div onclick="changeStudioColor('Navy', 'https://i.ibb.co.com/VcpZRQGC/3.jpg', this)" class="color-choice bg-blue-900"></div>
+                                <div onclick="changeStudioColor('Grey', 'https://i.ibb.co.com/Q3Hztnx1/6.jpg', this)" class="color-choice bg-gray-500"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase mb-4 tracking-widest italic">2. Upload Desain Kamu</label>
+                            <input type="file" id="studio-upload" accept="image/*" class="hidden" onchange="previewStudioImage(event)">
+                            <label for="studio-upload" class="group flex flex-col items-center justify-center p-10 rounded-[2rem] bg-slate-50 border-2 border-dashed border-slate-200 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all text-center">
+                                <i data-lucide="image-plus" class="w-12 h-12 text-slate-300 group-hover:text-blue-500 mb-2"></i>
+                                <span class="text-sm font-bold text-slate-600">Pilih Gambar</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase mb-4 tracking-widest italic">3. Ukuran Sablon</label>
+                            <select id="studio-size" onchange="updateStudioPrice()" class="w-full p-5 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-200 font-bold outline-none">
+                                <option value="30000">Sablon A3 (Besar) + Rp 30.000</option>
+                                <option value="20000">Sablon A4 (Sedang) + Rp 20.000</option>
+                                <option value="10000">Logo Dada (Kecil) + Rp 10.000</option>
+                            </select>
+                        </div>
+                        <div class="pt-8 border-t border-slate-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Estimasi Total</p>
+                                <p id="studio-price-tag" class="text-3xl font-black text-blue-600">Rp 85.000</p>
+                            </div>
+                            <button onclick="checkoutStudioWA()" class="bg-green-500 text-white font-black py-5 px-8 rounded-2xl hover:bg-slate-900 transition-all shadow-xl flex items-center gap-3">
+                                ORDER WA <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-detail" class="page hidden container mx-auto px-4 py-8">
+        <button onclick="showPage('home')" class="mb-6 flex items-center gap-2 text-slate-400 hover:text-blue-600 font-bold">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali
+        </button>
+        <div class="grid lg:grid-cols-2 gap-10 bg-white p-6 md:p-12 rounded-[3rem] shadow-sm border border-slate-100">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex md:flex-col gap-3 order-2 md:order-1">
+                    <div id="thumb-front" onclick="switchImg('front')" class="w-16 h-20 md:w-20 md:h-24 rounded-2xl overflow-hidden border-2 cursor-pointer active-thumb"><img id="detail-thumb-front" src="" class="w-full h-full object-cover"></div>
+                    <div id="thumb-back" onclick="switchImg('back')" class="w-16 h-20 md:w-20 md:h-24 rounded-2xl overflow-hidden border-2 border-transparent cursor-pointer"><img id="detail-thumb-back" src="" class="w-full h-full object-cover"></div>
+                </div>
+                <div class="flex-1 aspect-[3/4] rounded-[2rem] overflow-hidden bg-slate-50 order-1 md:order-2 shadow-inner"><img id="main-detail-img" src="" class="w-full h-full object-cover transition-opacity duration-300"></div>
+            </div>
+            <div class="flex flex-col justify-center py-4 md:py-0 text-center md:text-left">
+                <h2 id="detail-title" class="text-3xl md:text-5xl font-black mb-2 tracking-tighter"></h2>
+                <p id="detail-price" class="text-3xl font-extrabold text-blue-600 mb-8"></p>
+                <div class="space-y-8">
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase mb-4 italic">Material Bahan</label>
+                        <select id="input-material" class="w-full p-5 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-200 outline-none font-bold text-slate-700">
+                            <option value="Cotton Combed 30s">Cotton Combed 30s (Adem)</option>
+                            <option value="Cotton Combed 24s">Cotton Combed 24s (Tebal)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase mb-4 italic">Pilih Ukuran</label>
+                        <div class="grid grid-cols-4 gap-3">
+                            <button onclick="setSize(this, 'S')" class="btn-size py-4 rounded-2xl border-2 border-slate-100 font-bold">S</button>
+                            <button onclick="setSize(this, 'M')" class="btn-size py-4 rounded-2xl border-2 border-slate-100 font-bold">M</button>
+                            <button onclick="setSize(this, 'L')" class="btn-size py-4 rounded-2xl border-2 border-slate-100 font-bold">L</button>
+                            <button onclick="setSize(this, 'XL')" class="btn-size py-4 rounded-2xl border-2 border-slate-100 font-bold">XL</button>
+                        </div>
+                    </div>
+                    <button onclick="addToCart()" class="w-full bg-slate-900 text-white font-black py-5 rounded-[1.5rem] hover:bg-blue-600 transition-all shadow-xl flex justify-center items-center gap-3">
+                        <i data-lucide="shopping-bag" class="w-6 h-6"></i> TAMBAH KE KERANJANG
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-cart" class="page hidden container mx-auto px-4 py-12">
+        <h2 class="text-3xl font-black mb-10 italic uppercase">Keranjang</h2>
+        <div class="grid lg:grid-cols-3 gap-12">
+            <div class="lg:col-span-2 space-y-4" id="cart-list"></div>
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 h-fit">
+                <p class="text-sm font-bold text-slate-400 uppercase mb-2 tracking-widest">Total Harga</p>
+                <p id="total-price" class="text-3xl font-black text-blue-600 mb-8">Rp 0</p>
+                <button onclick="checkoutWA()" class="w-full bg-green-500 text-white font-black py-5 rounded-2xl hover:bg-green-600 shadow-lg flex justify-center items-center gap-2">
+                    <i data-lucide="message-circle" class="w-6 h-6"></i> BAYAR VIA WA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer" class="bg-slate-900 py-12 text-white text-center mt-12">
+        <h2 class="text-xl font-black text-blue-500 italic uppercase mb-2">sablonhitz</h2>
+        <p class="text-slate-500 text-[10px] uppercase tracking-[0.4em] font-bold">&copy; 2026 PREMIUM APP - sablonhitz</p>
+    </footer>
+
+    <script>
+        const products = [
+            { id: 1, name: "Skull Art Black Edition", price: 149000, imgF: "https://i.ibb.co.com/xKCGCJjN/1.jpg", imgB: "https://i.ibb.co.com/xKCGCJjN/1.jpg" },
+            { id: 2, name: "Vintage Logo White", price: 135000, imgF: "https://i.ibb.co.com/Psr7q0Jm/2.jpg", imgB: "https://i.ibb.co.com/Psr7q0Jm/2.jpg" },
+            { id: 3, name: "Cyberpunk Blue Design", price: 159000, imgF: "https://i.ibb.co.com/VcpZRQGC/3.jpg", imgB: "https://i.ibb.co.com/VcpZRQGC/3.jpg" },
+            { id: 4, name: "Minimalist Typography", price: 129000, imgF: "https://i.ibb.co.com/jvGSGH0s/4.jpg", imgB: "https://i.ibb.co.com/jvGSGH0s/4.jpg" },
+            { id: 5, name: "Abstract Pattern 2026", price: 149000, imgF: "https://i.ibb.co.com/wN9pHqSH/5.jpg", imgB: "https://i.ibb.co.com/wN9pHqSH/5.jpg" },
+            { id: 6, name: "Urban Streetwear Grey", price: 145000, imgF: "https://i.ibb.co.com/Q3Hztnx1/6.jpg", imgB: "https://i.ibb.co.com/Q3Hztnx1/6.jpg" },
+            { id: 7, name: "Nature Vibe Green", price: 139000, imgF: "https://i.ibb.co.com/Kxwm31rf/7.jpg", imgB: "https://i.ibb.co.com/Kxwm31rf/7.jpg" },
+            { id: 8, name: "Premium Discharge Print", price: 169000, imgF: "https://i.ibb.co.com/Y7w9p9WX/8.jpg", imgB: "https://i.ibb.co.com/Y7w9p9WX/8.jpg" },
+        ];
+
+        let cart = [];
+        let selectedProduct = null;
+        let activeSize = '';
+        let studioColor = 'Hitam';
+        let baseStudioPrice = 55000;
+
+        function renderHome(isAll = false) {
+            const grid = document.getElementById('product-grid');
+            const displayProducts = isAll ? products : products.slice(0, 8); 
+            grid.innerHTML = displayProducts.map(p => `
+                <div class="bg-white rounded-[2rem] overflow-hidden border border-slate-100 group cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500" onclick="openDetail(${p.id})">
+                    <div class="aspect-[3/4] overflow-hidden bg-slate-50"><img src="${p.imgF}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"></div>
+                    <div class="p-6 text-center">
+                        <h4 class="font-bold text-slate-800 text-sm truncate uppercase italic tracking-tighter">${p.name}</h4>
+                        <p class="text-blue-600 font-black mt-1">Rp ${p.price.toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            
+            const heroBanner = document.getElementById('hero-banner');
+            const extras = document.getElementById('extra-sections');
+            const katalogTitle = document.getElementById('katalog-title');
+
+            if (pageId === 'home') {
+                document.getElementById('page-home').classList.remove('hidden');
+                heroBanner.classList.remove('hidden');
+                extras.classList.remove('hidden');
+                katalogTitle.innerText = "Katalog Terbaru";
+                renderHome(false);
+            } 
+            else if (pageId === 'catalog') {
+                document.getElementById('page-home').classList.remove('hidden');
+                heroBanner.classList.add('hidden');
+                extras.classList.add('hidden');
+                katalogTitle.innerText = "Semua Produk";
+                renderHome(true);
+            } 
+            else if (pageId === 'custom') {
+                document.getElementById('page-custom').classList.remove('hidden');
+            }
+            else {
+                document.getElementById('page-' + pageId).classList.remove('hidden');
+            }
+
+            window.scrollTo(0,0);
+            if(pageId === 'cart') renderCart();
+        }
+
+        function openDetail(id) {
+            selectedProduct = products.find(p => p.id === id);
+            activeSize = ''; 
+            document.getElementById('detail-title').innerText = selectedProduct.name;
+            document.getElementById('detail-price').innerText = "Rp " + selectedProduct.price.toLocaleString();
+            document.getElementById('main-detail-img').src = selectedProduct.imgF;
+            document.getElementById('detail-thumb-front').src = selectedProduct.imgF;
+            document.getElementById('detail-thumb-back').src = selectedProduct.imgB;
+            switchImg('front');
+            showPage('detail');
+        }
+
+        function switchImg(side) {
+            const main = document.getElementById('main-detail-img');
+            const tf = document.getElementById('thumb-front');
+            const tb = document.getElementById('thumb-back');
+            if(side === 'front') {
+                main.src = selectedProduct.imgF;
+                tf.classList.add('active-thumb');
+                tb.classList.remove('active-thumb');
+            } else {
+                main.src = selectedProduct.imgB;
+                tb.classList.add('active-thumb');
+                tf.classList.remove('active-thumb');
+            }
+        }
+
+        function setSize(btn, size) {
+            document.querySelectorAll('.btn-size').forEach(b => b.classList.remove('active-size'));
+            btn.classList.add('active-size');
+            activeSize = size;
+        }
+
+        function addToCart() {
+            if(!activeSize) return alert("Pilih ukuran dulu ya!");
+            const material = document.getElementById('input-material').value;
+            cart.push({ ...selectedProduct, size: activeSize, material: material });
+            document.getElementById('cart-count').innerText = cart.length;
+            showPage('cart');
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-list');
+            if(cart.length === 0) { list.innerHTML = `<div class="p-16 text-center bg-white rounded-[2rem] border-2 border-dashed border-slate-100 text-slate-300 font-bold italic">Keranjang Kosong</div>`; document.getElementById('total-price').innerText = "Rp 0"; return; }
+            let total = 0;
+            list.innerHTML = cart.map((item, idx) => {
+                total += item.price;
+                return `<div class="bg-white p-6 rounded-3xl flex gap-6 items-center border border-slate-100"><img src="${item.imgF}" class="w-20 h-20 rounded-2xl object-cover"><div class="flex-1"><h4 class="font-extrabold text-slate-800 text-sm truncate uppercase italic tracking-tighter">${item.name}</h4><p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">${item.material} / ${item.size}</p><p class="text-blue-600 font-black mt-1 text-base">Rp ${item.price.toLocaleString()}</p></div><button onclick="removeItem(${idx})" class="text-red-300 hover:text-red-500 p-2 transition-colors"><i data-lucide="trash-2"></i></button></div>`;
+            }).join('');
+            document.getElementById('total-price').innerText = "Rp " + total.toLocaleString();
+            lucide.createIcons();
+        }
+
+        function removeItem(idx) { cart.splice(idx, 1); document.getElementById('cart-count').innerText = cart.length; renderCart(); }
+
+        function checkoutWA() {
+            if(cart.length === 0) return;
+            const waNumber = "6281234567890";
+            let pesan = `Halo Sablonhitz, saya ingin pesan:\n\n`;
+            cart.forEach((item, i) => { pesan += `${i+1}. ${item.name} (${item.material} / Size ${item.size})\n`; });
+            pesan += `\n*Total Tagihan: ${document.getElementById('total-price').innerText}*`;
+            window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(pesan)}`);
+        }
+
+        /* CUSTOM STUDIO FUNCTIONS */
+        function changeStudioColor(name, src, element) {
+            studioColor = name;
+            document.getElementById('mockup-bg').src = src;
+            document.querySelectorAll('.color-choice').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function previewStudioImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('user-upload-img');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateStudioPrice() {
+            const extra = parseInt(document.getElementById('studio-size').value);
+            const total = baseStudioPrice + extra;
+            document.getElementById('studio-price-tag').innerText = "Rp " + total.toLocaleString('id-ID');
+        }
+
+        function checkoutStudioWA() {
+            const sizeName = document.getElementById('studio-size').options[document.getElementById('studio-size').selectedIndex].text;
+            const finalPrice = document.getElementById('studio-price-tag').innerText;
+            const pesanWA = `Halo Sablonhitz!\n\nSaya ingin Order Custom Sablon:\n` +
+                            `- Warna Kaos: ${studioColor}\n` +
+                            `- Ukuran Cetak: ${sizeName}\n` +
+                            `- Total Estimasi: ${finalPrice}\n\n` +
+                            `*Desain akan saya kirim setelah pesan ini.*`;
+            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(pesanWA)}`);
+        }
+
+        renderHome();
+        lucide.createIcons();
+        updateStudioPrice();
+    </script>
+</body>
+</html>
